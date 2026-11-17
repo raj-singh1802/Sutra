@@ -1,0 +1,200 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Sutra</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: one calm column. Brief header, the day's plan as a timeline, then a queue of drafts that wait for approval. */
+:root{
+  --bg:#F3F5F6; --surface:#FFFFFF; --fg:#10252B; --muted:#586B72; --line:#DDE3E6; --soft:#E9EEF0;
+  --accent:#0B6E6E; --accent-ink:#FFFFFF; --good:#1B7F55; --good-bg:#E3F4EC; --warn:#9A5B00; --warn-bg:#FFF1D6;
+  --font-h:'Space Grotesk',system-ui,sans-serif; --font-b:'Inter',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1619; --surface:#142126; --fg:#E8F0F2; --muted:#9BB0B7; --line:#26383E; --soft:#1C2D33;
+    --accent:#4FC3C3; --accent-ink:#06191A; --good:#4FD1A0; --good-bg:#12302A; --warn:#F2B658; --warn-bg:#35280F; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1619; --surface:#142126; --fg:#E8F0F2; --muted:#9BB0B7; --line:#26383E; --soft:#1C2D33;
+  --accent:#4FC3C3; --accent-ink:#06191A; --good:#4FD1A0; --good-bg:#12302A; --warn:#F2B658; --warn-bg:#35280F; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-b);font-size:15px;line-height:1.5;
+  padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--font-h);margin:0;text-wrap:balance}
+h1{font-size:30px;line-height:1.1}
+h2{font-size:18px}
+p{margin:0}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.lede{color:var(--muted);margin-top:6px;max-width:54ch}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.top{display:flex;flex-direction:column;gap:12px}
+.progress{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.bar{flex:1;height:6px;border-radius:99px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+.dial{display:flex;flex-direction:column;gap:6px}
+.lbl{font-size:13px;font-weight:600;color:var(--muted)}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:var(--soft);padding:4px;border-radius:10px}
+.seg button{border:0;background:transparent;padding:8px 6px;border-radius:7px;font-weight:600;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.hint{font-size:13px;color:var(--muted)}
+section{display:flex;flex-direction:column;gap:10px}
+.sec-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.toggle{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600}
+.toggle[aria-pressed=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.plan{list-style:none;margin:0;padding:0}
+.slot{display:grid;grid-template-columns:52px 24px minmax(0,1fr);gap:8px;align-items:start;padding-block:10px;border-top:1px solid var(--line)}
+.slot:first-child{border-top:0}
+.time{font-family:var(--font-h);font-weight:700;font-variant-numeric:tabular-nums;color:var(--muted);padding-top:1px}
+.slot input{width:20px;height:20px;accent-color:var(--accent);margin:2px 0 0}
+.slot .ttl{font-weight:600}
+.slot.done .ttl{text-decoration:line-through;color:var(--muted)}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.src{font-size:12px;background:var(--soft);border-radius:999px;padding:2px 9px;color:var(--muted);font-weight:600}
+.why{font-size:13px;color:var(--muted);margin-top:4px}
+.why[hidden]{display:none}
+.draft{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.draft-h{display:flex;justify-content:space-between;align-items:start;gap:8px}
+.draft h3{font-size:16px}
+.risk{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.risk.high{background:var(--warn-bg);color:var(--warn)}
+.risk.low{background:var(--good-bg);color:var(--good)}
+.to{font-size:13px;color:var(--muted)}
+.body{white-space:pre-wrap;background:var(--bg);border-radius:9px;padding:10px 12px;font-size:14px}
+textarea{width:100%;min-height:150px;font:inherit;font-size:14px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px;resize:vertical}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;padding:9px 16px;border-radius:9px}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.status{font-size:14px;font-weight:600;color:var(--good)}
+.status.skip{color:var(--muted)}
+.empty{color:var(--muted)}
+.foot{font-size:12px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Tuesday 17 November · sample data</p>
+      <h1>Good morning, Raj</h1>
+      <p class="lede">Here is your day, and three things Sutra prepared that wait for your say.</p>
+    </div>
+    <div class="progress"><span id="prog-txt"></span><div class="bar" aria-hidden="true"><i id="prog-bar"></i></div></div>
+    <div class="dial">
+      <span class="lbl" id="dial-l">How much may Sutra do on its own?</span>
+      <div class="seg" role="group" aria-labelledby="dial-l">
+        <button type="button" data-mode="ask" aria-pressed="true">Ask me first</button>
+        <button type="button" data-mode="draft" aria-pressed="false">Draft only</button>
+        <button type="button" data-mode="auto" aria-pressed="false">Auto for low risk</button>
+      </div>
+      <p class="hint" id="dial-hint"></p>
+    </div>
+  </header>
+
+  <section aria-labelledby="h-plan">
+    <div class="sec-h">
+      <h2 id="h-plan">Today's plan</h2>
+      <button type="button" class="toggle" id="why-toggle" aria-pressed="false">Show why</button>
+    </div>
+    <ol class="plan" id="plan"></ol>
+  </section>
+
+  <section aria-labelledby="h-drafts">
+    <h2 id="h-drafts">Waiting for your approval</h2>
+    <div id="drafts"></div>
+  </section>
+
+  <p class="foot">Demo only. Sample inbox, calendar and notes; nothing is sent. The full product would read your real accounts through a private memory layer.</p>
+</div>
+
+<script>
+const PLAN=[
+ {id:'p1',t:'09:00',title:'Reply to the recruiter and pick a screening slot',src:'Gmail',why:'Priya wrote two days ago. The three slots she offered expire Thursday.'},
+ {id:'p2',t:'10:00',title:'Deep work: finish the API layer for the take-home',src:'Notes',why:'Due Friday with three of five tasks still open. This is your longest free block.'},
+ {id:'p3',t:'14:00',title:'Mock interview: system design',src:'Calendar',why:'Booked last week. Prep notes from your last session are attached.'},
+ {id:'p4',t:'16:00',title:'Add the new project to your resume',src:'Notes',why:'You set this as a goal on 10 November and it has not moved.'},
+ {id:'p5',t:'17:30',title:'Send follow-ups from the applications tracker',src:'Sheets',why:'Four applications have had no reply for more than seven days.'}
+];
+const DRAFTS=[
+ {id:'d1',risk:'high',title:'Reply to Priya about the screening call',to:'To: priya@example-recruiting.com · Subject: Re: Screening call',
+  body:"Hi Priya,\n\nThank you for reaching out. Thursday at 11:00 works for me.\n\nI have attached my latest resume. Please let me know if you need anything else before the call.\n\nBest,\nRaj"},
+ {id:'d2',risk:'high',title:'Follow up on the backend engineer application',to:'To: careers@example-startup.com · Subject: Following up on my application',
+  body:"Hello,\n\nI applied for the backend engineer role last Monday and wanted to check on the status. I have since completed a take-home on payment recovery with an agent service, which I would be happy to walk through.\n\nThank you for your time,\nRaj"},
+ {id:'d3',risk:'low',title:'Move your interview prep reminder 15 minutes earlier',to:'Calendar change · 13:30 becomes 13:15 · only you are affected',
+  body:"Your mock interview starts at 14:00. Moving the reminder to 13:15 leaves time to reread your notes."}
+];
+const HINTS={
+ ask:'Every draft waits for your approval. Nothing is sent without a tap.',
+ draft:'Sutra prepares drafts only. You send them yourself.',
+ auto:'Changes that only affect you, like your own calendar, happen automatically. Messages to other people still wait.'
+};
+const S={mode:'ask',why:false,done:{},status:{},edit:{},text:{}};
+DRAFTS.forEach(d=>{S.text[d.id]=d.body});
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function stateOf(d){
+  if(S.status[d.id]) return S.status[d.id];
+  if(S.mode==='auto'&&d.risk==='low') return 'auto';
+  return null;
+}
+function renderPlan(){
+  $('plan').innerHTML=PLAN.map(p=>
+   '<li class="slot'+(S.done[p.id]?' done':'')+'"><span class="time">'+p.t+'</span>'+
+   '<input type="checkbox" id="c-'+p.id+'" data-plan="'+p.id+'"'+(S.done[p.id]?' checked':'')+' aria-label="Mark done: '+esc(p.title)+'">'+
+   '<div><label for="c-'+p.id+'" class="ttl">'+esc(p.title)+'</label>'+
+   '<div class="meta"><span class="src">'+p.src+'</span></div>'+
+   '<p class="why"'+(S.why?'':' hidden')+'>'+esc(p.why)+'</p></div></li>'
+  ).join('');
+}
+function renderDrafts(){
+  $('drafts').innerHTML=DRAFTS.map(d=>{
+    const st=stateOf(d);
+    let foot='';
+    if(st==='auto') foot='<p class="status">Done automatically. Low risk, only affects you.</p>';
+    else if(st==='sent') foot='<p class="status">'+(S.mode==='draft'?'Marked as sent by you.':'Approved. The real product would send this now.')+'</p>';
+    else if(st==='skip') foot='<p class="status skip">Skipped.</p>';
+    else{
+      const label=S.mode==='draft'?'Copy and mark sent':'Approve and send';
+      foot='<div class="actions"><button type="button" class="btn" data-act="approve" data-id="'+d.id+'">'+label+'</button>'+
+        '<button type="button" class="btn ghost" data-act="edit" data-id="'+d.id+'">'+(S.edit[d.id]?'Done editing':'Edit')+'</button>'+
+        '<button type="button" class="btn ghost" data-act="skip" data-id="'+d.id+'">Skip</button></div>';
+    }
+    const body=(S.edit[d.id]&&!st)?'<textarea id="t-'+d.id+'" data-text="'+d.id+'" aria-label="Edit draft">'+esc(S.text[d.id])+'</textarea>':'<div class="body">'+esc(S.text[d.id])+'</div>';
+    return '<article class="draft"><div class="draft-h"><div><h3>'+esc(d.title)+'</h3><p class="to">'+esc(d.to)+'</p></div>'+
+      '<span class="risk '+d.risk+'">'+(d.risk==='high'?'Needs you':'Low risk')+'</span></div>'+body+foot+'</article>';
+  }).join('');
+}
+function renderProgress(){
+  const handled=DRAFTS.filter(d=>stateOf(d)).length, ticks=PLAN.filter(p=>S.done[p.id]).length;
+  const total=DRAFTS.length+PLAN.length, got=handled+ticks;
+  $('prog-txt').textContent=handled+' of '+DRAFTS.length+' drafts handled · '+ticks+' of '+PLAN.length+' tasks done';
+  $('prog-bar').style.width=Math.round(got/total*100)+'%';
+}
+function renderMode(){
+  document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===S.mode));
+  $('dial-hint').textContent=HINTS[S.mode];
+}
+function renderAll(){renderMode();renderPlan();renderDrafts();renderProgress();$('why-toggle').setAttribute('aria-pressed',S.why);$('why-toggle').textContent=S.why?'Hide why':'Show why'}
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.mode){S.mode=b.dataset.mode;renderAll()}
+  else if(b.id==='why-toggle'){S.why=!S.why;renderAll()}
+  else if(b.dataset.act==='approve'){S.status[b.dataset.id]='sent';renderDrafts();renderProgress()}
+  else if(b.dataset.act==='skip'){S.status[b.dataset.id]='skip';renderDrafts();renderProgress()}
+  else if(b.dataset.act==='edit'){S.edit[b.dataset.id]=!S.edit[b.dataset.id];renderDrafts()}
+});
+document.addEventListener('change',e=>{
+  if(e.target.dataset&&e.target.dataset.plan){S.done[e.target.dataset.plan]=e.target.checked;renderPlan();renderProgress()}
+});
+document.addEventListener('input',e=>{
+  if(e.target.dataset&&e.target.dataset.text) S.text[e.target.dataset.text]=e.target.value;
+});
+renderAll();
+</script>
+
+</body></html>
